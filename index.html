@@ -102,6 +102,33 @@
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    document.addEventListener('DOMContentLoaded', () =>{
+      const buttons = document.querySelectorAll('#error-btns button');
+
+      buttons[0].addEventListener('click', () => console.log('console log!'));
+      buttons[1].addEventListener('click', () => console.error('console error!'));
+      buttons[2].addEventListener('click', () => console.count('console count!'));
+      buttons[3].addEventListener('click', () => console.warn('console warn!'));
+      buttons[4].addEventListener('click', () => console.assert('console count!'));
+      buttons[5].addEventListener('click', () => console.clear());
+      buttons[6].addEventListener('click', () => console.dir(document.body));
+      buttons[7].addEventListener('click', () => console.dirxml(document.body));
+      buttons[8].addEventListener('click', () => console.group('console group!'));
+      buttons[9].addEventListener('click', () => console.groupEnd());
+      buttons[10].addEventListener('click', () => {
+        console.table([ {name: 'error', number: 2}, {name: 'exception', number: 1}]);
+      }
+    );
+      buttons[11].addEventListener('click', () => console.time('console time'));
+      buttons[12].addEventListener('click', () => console.timeEnd('console time'));
+      buttons[13].addEventListener('click', () => console.trace('console trace'));
+      buttons[14].addEventListener('click', () => {
+        nonExist();
+      }
+    );
+    }
+  );
   </script>
 </body>
 
