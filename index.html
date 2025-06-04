@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab 9</title>
+  
 
   <style>
     button {
@@ -47,6 +48,14 @@
       width: 122px;
     }
   </style>
+
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "280d36dc06c24aeb9a3b5c9a6bf2e809"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
 </head>
 
 <body>
@@ -88,6 +97,15 @@
   </main>
 
   <script>
+
+    class CalculationError extends Error{
+      constructor(message){
+        super(message);
+        this.name = 'CalculationError';
+      }
+    }
+
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,10 +113,41 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      try{
+        if(firstNum === '' || secondNum === ''){
+          throw new CalculationError('Provided both blank!');
+        }
+
+        if(isNaN(firstNum) || isNaN(secondNum)){
+          throw new CalculationError('Provide only number!');
+        }
+
+        if(operator === '/' && Number(secondNum) === 0)
+        throw new CalculationError("You cannot divide with 0!");
+      
+
+      let result = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      output.innerHTML = result;
+      } catch(err){
+        console.error(err);
+        output.innerHTML = `<span style="color: red;">Error: ${err.message}</span>`;
+      } finally{
+        console.log('Calculated.');
+      }
+
     });
 
-    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+    window.onerror = function(message, source, lineNo, colNo, error){
+      console.log('Gobal error');
+      console.log('Message', message);
+      console.log('Source', source);
+      console.log('Line: ', lineNo);
+      console.log('Column: ', colNo);
+      console.log('Error: ', error);
+      return true;
+    }
 
     // Start your code here
     // You may move this JS to another file if you wish
@@ -106,23 +155,34 @@
     document.addEventListener('DOMContentLoaded', () =>{
       const buttons = document.querySelectorAll('#error-btns button');
 
-      buttons[0].addEventListener('click', () => console.log('console log!'));
-      buttons[1].addEventListener('click', () => console.error('console error!'));
-      buttons[2].addEventListener('click', () => console.count('console count!'));
-      buttons[3].addEventListener('click', () => console.warn('console warn!'));
-      buttons[4].addEventListener('click', () => console.assert('console count!'));
+      buttons[0].addEventListener('click', () => console.log('Console Log Demo'));
+      buttons[1].addEventListener('click', () => console.error('Console Error Demo'));
+      buttons[2].addEventListener('click', () => console.count('Console count: '));
+      buttons[3].addEventListener('click', () => console.warn('Console Warn Button'));
+      buttons[4].addEventListener('click', () => console.assert(2 == 3, 'The number does not equal to 3'));
       buttons[5].addEventListener('click', () => console.clear());
-      buttons[6].addEventListener('click', () => console.dir(document.body));
-      buttons[7].addEventListener('click', () => console.dirxml(document.body));
-      buttons[8].addEventListener('click', () => console.group('console group!'));
+
+      buttons[6].addEventListener('click', () => console.dir(document.head));
+      buttons[7].addEventListener('click', () => console.dirxml(document));
+
+      buttons[8].addEventListener('click', () => console.group());
       buttons[9].addEventListener('click', () => console.groupEnd());
+
       buttons[10].addEventListener('click', () => {
-        console.table([ {name: 'error', number: 2}, {name: 'exception', number: 1}]);
+        console.table([ {name: 'error', number: 1}, {name: 'exception', number: 2}]);
       }
     );
+
       buttons[11].addEventListener('click', () => console.time('console time'));
       buttons[12].addEventListener('click', () => console.timeEnd('console time'));
-      buttons[13].addEventListener('click', () => console.trace('console trace'));
+
+      buttons[13].addEventListener('click', () =>{
+        const deepest = () => {deeper(); };
+        const deeper = () => {deep(); };
+        const deep = () => {console.trace(); };
+        deepest();
+      });
+
       buttons[14].addEventListener('click', () => {
         nonExist();
       }
