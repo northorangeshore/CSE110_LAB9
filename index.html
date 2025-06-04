@@ -98,43 +98,53 @@
   </main>
 
   <script>
-    window.onerror = function (message, source, lineno, colno, error) {
-      console.log("Global Error:", { message, source, lineno, colno, error });
-      return true;
-    };
+
+    class CalculationError extends Error{
+      constructor(message){
+        super(message);
+        this.name = 'CalculationError';
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
       const output = document.querySelector('output');
+      const firstNum = document.querySelector('#first-num').value;
+      const secondNum = document.querySelector('#second-num').value;
+      const operator = document.querySelector('#operator').value;
+
       try {
-        const firstNum = parseFloat(document.querySelector('#first-num').value);
-        const secondNum = parseFloat(document.querySelector('#second-num').value);
-        const operator = document.querySelector('#operator').value;
+        if (firstNum === '' || secondNum === '') {
+          throw new CalculationError("Please enter both numbers!");
+        }
 
         if (isNaN(firstNum) || isNaN(secondNum)) {
-          throw new Error("Please enter valid numbers!");
+          throw new CalculationError("Please enter valid numbers!");
         }
 
-        let result;
-        switch (operator) {
-          case '+': result = firstNum + secondNum; break;
-          case '-': result = firstNum - secondNum; break;
-          case '*': result = firstNum * secondNum; break;
-          case '/':
-            if (secondNum === 0) throw new Error("Cannot divide by zero!");
-            result = firstNum / secondNum;
-            break;
-          default: throw new Error("Invalid operator!");
+        if (operator === '/' && Number(secondNum) === 0) {
+          throw new CalculationError("Cannot divide with 0!");
         }
+
+        let result = eval(`${firstNum} ${operator} ${secondNum}`);
         output.innerHTML = result;
+
       } catch (err) {
-        output.innerHTML = `Error: ${err.message}`;
         console.error(err);
+        output.innerHTML = `<span style="color: red;">Error: ${err.message}</span>`;
+      } finally{
+        console.log('Calculation success');
       }
+      
     });
 
-    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log("Global Error:", { message, source, lineno, colno, error });
+      return true;
+    };
+    
     // Start your code here
     // You may move this JS to another file if you wish
 
@@ -169,31 +179,6 @@
         nonExist();
       });
 
-      buttons[15].addEventListener('click', () => {
-        try {
-          let el = document.querySelector('#does-not-exist');
-          el.innerText = 'This will throw!';
-        } catch (err) {
-          console.error('Caught an error:', err);
-        } finally {
-          console.log('This runs regardless.');
-        }
-      });
-
-      class CustomError extends Error {
-        constructor(message) {
-          super(message);
-          this.name = 'CustomError';
-        }
-      }
-
-      buttons[16].addEventListener('click', () => {
-        try {
-          throw new CustomError('Oops! Something is wrong!');
-        } catch (e) {
-          console.error(`${e.name}: ${e.message}`);
-        }
-      });
     });
   </script>
 </body>
