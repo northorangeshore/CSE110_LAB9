@@ -132,7 +132,7 @@
       output.innerHTML = result;
       } catch(err){
         console.error(err);
-        output.innerHTML = `<span style="color: red;">Error: ${err.message}</span>`;
+        output.innerHTML = `${err.message}`;
       } finally{
         console.log('Calculated.');
       }
