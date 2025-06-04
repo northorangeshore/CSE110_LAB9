@@ -47,13 +47,13 @@
       width: 122px;
     }
   </style>
-  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <!-- <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
     window.TrackJS && TrackJS.install({ 
       token: "2ec197e6279d49bda7ef4950fbabf691",
       application: "lab9"
     });
-  </script>
+  </script>     -->
 </head>
 
 <body>
@@ -98,40 +98,34 @@
   </main>
 
   <script>
-    window.onerror = function (message, source, lineno, colno, error) {
-      console.log("Global Error:", { message, source, lineno, colno, error });
-      return true;
-    };
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
       const output = document.querySelector('output');
+      const previousOutput = output.innerHTML;
+
+      const first = document.querySelector('#first-num').value;
+      const second = document.querySelector('#second-num').value;
+      const operator = document.querySelector('#operator').value;
+
+      const expression = `${first} ${operator} ${second}`;
+
       try {
-        const firstNum = parseFloat(document.querySelector('#first-num').value);
-        const secondNum = parseFloat(document.querySelector('#second-num').value);
-        const operator = document.querySelector('#operator').value;
+        const result = eval(expression);
 
-        if (isNaN(firstNum) || isNaN(secondNum)) {
-          throw new Error("Please enter valid numbers!");
+        if (typeof result !== 'number' || isNaN(result) || !isFinite(result)) {
+          throw new Error("Invalid numeric result.");
         }
 
-        let result;
-        switch (operator) {
-          case '+': result = firstNum + secondNum; break;
-          case '-': result = firstNum - secondNum; break;
-          case '*': result = firstNum * secondNum; break;
-          case '/':
-            if (secondNum === 0) throw new Error("Cannot divide by zero!");
-            result = firstNum / secondNum;
-            break;
-          default: throw new Error("Invalid operator!");
-        }
         output.innerHTML = result;
       } catch (err) {
-        output.innerHTML = `Error: ${err.message}`;
+        output.innerHTML = previousOutput;
+        console.log("something is wrong my friend");
         console.error(err);
       }
     });
+
+
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
@@ -146,27 +140,45 @@
       buttons[2].addEventListener('click', () => console.count('Count Button'));
       buttons[3].addEventListener('click', () => console.warn('console Warn Button'));
       buttons[4].addEventListener('click', () => {
-        console.assert(3 === 5, "3 is not equal to 5!");
+        const obj = { number: 4, errorMsg: 'The number does not equal 3' };
+        if (obj.number !== 3) {
+          console.error("Assertion failed:\n", obj);
+        }
       });
       buttons[5].addEventListener('click', () => console.clear());
-      buttons[6].addEventListener('click', () => console.dir(document.body));
-      buttons[7].addEventListener('click', () => console.dirxml(document.body));
+      buttons[6].addEventListener('click', () => {
+        console.dir(document.createElement('button'));
+      });
+      buttons[7].addEventListener('click', () => {
+        const tempButton = document.createElement('button');
+        tempButton.textContent = 'Console dirxml';
+        console.dirxml(tempButton);
+      });
       buttons[8].addEventListener('click', () => {
-        console.group("Classes taken");
+        console.group("console.group");
       });
       buttons[9].addEventListener('click', () => {
-        console.log("Department: CSE");
-        console.log("class: 110");
         console.groupEnd();
       });
       buttons[10].addEventListener('click', () => {
-        console.table([ {name: 'error', number: 2}, {name: 'exception', number: 1}]);
+        const courses = [
+          { name: 'Software Engineering', num: 142 },
+          { name: 'Programming Languages', num: 123 },
+          { name: 'Advanced Software', num: 171 }
+        ];
+        console.table(courses);
       });
-      buttons[11].addEventListener('click', () => console.time('console time'));
-      buttons[12].addEventListener('click', () => console.timeEnd('console time'));
-      buttons[13].addEventListener('click', () => console.trace('console trace'));
-      buttons[14].addEventListener('click', () => {
-        nonExist();
+      buttons[11].addEventListener('click', () => console.time('Timer Button'));
+      buttons[12].addEventListener('click', () => console.timeEnd('Timer Button'));
+      buttons[13].addEventListener('click', function handleBtnClick() {
+        function deepest() { console.trace('console.trace'); }
+        function deeper() { deepest(); }
+        function deep() { deeper(); }
+        deep();
+      });
+      buttons[14].addEventListener('click', function handleBtnClick() {
+        console.log("Something is wrong my friend");
+        boom; 
       });
 
       buttons[15].addEventListener('click', () => {
