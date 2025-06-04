@@ -47,6 +47,13 @@
       width: 122px;
     }
   </style>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "2ec197e6279d49bda7ef4950fbabf691",
+      application: "lab9"
+    });
+  </script>
 </head>
 
 <body>
@@ -84,18 +91,46 @@
       <button>End Timer</button>
       <button>Console Trace</button>
       <button>Trigger a Global Error</button>
+      <button>Try Catch Demo</button>
+      <button>Throw Custom Error</button>
+
     </section>
   </main>
 
   <script>
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log("Global Error:", { message, source, lineno, colno, error });
+      return true;
+    };
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      const output = document.querySelector('output');
+      try {
+        const firstNum = parseFloat(document.querySelector('#first-num').value);
+        const secondNum = parseFloat(document.querySelector('#second-num').value);
+        const operator = document.querySelector('#operator').value;
+
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new Error("Please enter valid numbers!");
+        }
+
+        let result;
+        switch (operator) {
+          case '+': result = firstNum + secondNum; break;
+          case '-': result = firstNum - secondNum; break;
+          case '*': result = firstNum * secondNum; break;
+          case '/':
+            if (secondNum === 0) throw new Error("Cannot divide by zero!");
+            result = firstNum / secondNum;
+            break;
+          default: throw new Error("Invalid operator!");
+        }
+        output.innerHTML = result;
+      } catch (err) {
+        output.innerHTML = `Error: ${err.message}`;
+        console.error(err);
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
@@ -106,29 +141,60 @@
     document.addEventListener('DOMContentLoaded', () =>{
       const buttons = document.querySelectorAll('#error-btns button');
 
-      buttons[0].addEventListener('click', () => console.log('console log!'));
-      buttons[1].addEventListener('click', () => console.error('console error!'));
-      buttons[2].addEventListener('click', () => console.count('console count!'));
-      buttons[3].addEventListener('click', () => console.warn('console warn!'));
-      buttons[4].addEventListener('click', () => console.assert('console count!'));
+      buttons[0].addEventListener('click', () => console.log('Console Log Demo'));
+      buttons[1].addEventListener('click', () => console.error('Console Error Demo'));
+      buttons[2].addEventListener('click', () => console.count('Count Button'));
+      buttons[3].addEventListener('click', () => console.warn('console Warn Button'));
+      buttons[4].addEventListener('click', () => {
+        console.assert(3 === 5, "3 is not equal to 5!");
+      });
       buttons[5].addEventListener('click', () => console.clear());
       buttons[6].addEventListener('click', () => console.dir(document.body));
       buttons[7].addEventListener('click', () => console.dirxml(document.body));
-      buttons[8].addEventListener('click', () => console.group('console group!'));
-      buttons[9].addEventListener('click', () => console.groupEnd());
+      buttons[8].addEventListener('click', () => {
+        console.group("Classes taken");
+      });
+      buttons[9].addEventListener('click', () => {
+        console.log("Department: CSE");
+        console.log("class: 110");
+        console.groupEnd();
+      });
       buttons[10].addEventListener('click', () => {
         console.table([ {name: 'error', number: 2}, {name: 'exception', number: 1}]);
-      }
-    );
+      });
       buttons[11].addEventListener('click', () => console.time('console time'));
       buttons[12].addEventListener('click', () => console.timeEnd('console time'));
       buttons[13].addEventListener('click', () => console.trace('console trace'));
       buttons[14].addEventListener('click', () => {
         nonExist();
+      });
+
+      buttons[15].addEventListener('click', () => {
+        try {
+          let el = document.querySelector('#does-not-exist');
+          el.innerText = 'This will throw!';
+        } catch (err) {
+          console.error('Caught an error:', err);
+        } finally {
+          console.log('This runs regardless.');
+        }
+      });
+
+      class CustomError extends Error {
+        constructor(message) {
+          super(message);
+          this.name = 'CustomError';
+        }
       }
-    );
-    }
-  );
+
+      buttons[16].addEventListener('click', () => {
+        try {
+          throw new CustomError('Oops! Something is wrong!');
+        } catch (e) {
+          console.error(`${e.name}: ${e.message}`);
+        }
+      });
+    });
   </script>
 </body>
 
